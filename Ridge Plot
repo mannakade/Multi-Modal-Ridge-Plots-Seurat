@@ -13,8 +13,8 @@ cbmc.rna <- CollapseSpeciesExpressionMatrix(cbmc.rna)
 
 cbmc.adt <- as.sparse(read.csv(file = "C:/Users/gabri/Desktop/CITE-seq data/**.ggz file**z", sep = ",", 
                                header = TRUE, row.names = 1))
-
-cbmc.adt <- cbmc.adt[setdiff(rownames(x = cbmc.adt), c("CCR5", "CCR7", "CD10")), ]
+cbmc.adt <- cbmc.adt[setdiff(rownames(x = cbmc.adt), c("CD11c", "TIGIT",  "CD141",  "CD14",  "CD4",  "CD183",  "CD8",    "CD197",  "CD207",  "CD117",  "CD1c",   "CD194",  "CD56",   "CD19",   "CD45RA", "CD69",  
+                                  "HLA-DR",  "CD123",  "CD25",   "CD45RO",  "CD15",   "CD279",  "TCRgd",  "CD3",    "CD16",   "CD196",  "CD11b",  "CD127",  "XCR1" )), ]
 
 
 cbmc <- CreateSeuratObject(counts = cbmc.rna)
