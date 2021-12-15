@@ -1,0 +1,56 @@
+library(Seurat)
+library(ggplot2)
+library(patchwork)
+
+setwd("C:/Users/")
+
+cbmc.rna <- as.sparse(read.csv(file = "C:/Users/gabri/Desktop/CITE-seq data/**.gz file**", sep = ",", 
+                               header = TRUE, row.names = 1))
+
+
+cbmc.rna <- CollapseSpeciesExpressionMatrix(cbmc.rna)
+
+
+cbmc.adt <- as.sparse(read.csv(file = "C:/Users/gabri/Desktop/CITE-seq data/**.ggz file**z", sep = ",", 
+                               header = TRUE, row.names = 1))
+
+cbmc.adt <- cbmc.adt[setdiff(rownames(x = cbmc.adt), c("CCR5", "CCR7", "CD10")), ]
+
+
+cbmc <- CreateSeuratObject(counts = cbmc.rna)
+
+cbmc <- NormalizeData(cbmc)
+
+
+cbmc <- FindVariableFeatures(cbmc)
+
+
+cbmc <- ScaleData(cbmc)
+
+cbmc <- RunPCA(cbmc, verbose = FALSE)
+ElbowPlot(cbmc, ndims = 50)
+
+cbmc <- FindNeighbors(cbmc, dims = 1:25)
+cbmc <- FindClusters(cbmc, resolution = 0.8)
+cbmc <- RunTSNE(cbmc, dims = 1:25, method = "FIt-SNE")
+
+cbmc.rna.markers <- FindAllMarkers(cbmc, max.cells.per.ident = 100, min.diff.pct = 0.3, only.pos = TRUE)
+
+new.cluster.ids <- c("Memory CD4 T", "CD14+ Mono", "Naive CD4 T", "NK", "CD14+ Mono", "Mouse", "B", 
+                     "CD8 T", "CD16+ Mono", "T/Mono doublets", "NK", "CD34+", "Multiplets", "Mouse", "Eryth", "Mk", 
+                     "Mouse", "DC", "pDCs")
+names(new.cluster.ids) <- levels(cbmc)
+cbmc <- RenameIdents(cbmc, new.cluster.ids)
+
+DimPlot(cbmc, label = TRUE) + NoLegend()
+
+
+cbmc[["ADT"]] <- CreateAssayObject(counts = cbmc.adt)
+
+cbmc <- NormalizeData(cbmc, assay = "ADT", normalization.method = "CLR")
+cbmc <- ScaleData(cbmc, assay = "ADT")
+
+FeaturePlot(cbmc, features = c("adt_CD3", "adt_CD11c", "adt_CD8", "adt_CD16", "CD3E", "ITGAX", "CD8A", 
+                               "FCGR3A"), min.cutoff = "q05", max.cutoff = "q95", ncol = 4)
+
+RidgePlot(cbmc, features = c("adt_CD3", "adt_CD11c", "adt_CD8", "adt_CD16"), ncol = 2)
