@@ -1,5 +1,9 @@
-library(Seurat)
+library(SeuratData)
 library(ggplot2)
+install.packages("Seurat")
+library(Seurat)
+install.packages(c('dplyr','patchwork'))
+library(dplyr)
 library(patchwork)
 
 setwd("C:/Users/")
@@ -54,4 +58,7 @@ FeaturePlot(cbmc, features = c("CD1c_TotalA", "CD3_TotalA", "CD4_TotalA", "CD8_T
                                "CD117_TotalA", "CD123_TotalA", "CD127_TotalA", "CD141_TotalA", "CD183_TotalA", "CD194_TotalA", "CD196_TotalA", "CD197_TotalA",
                                "CD207_TotalA", "CD279_TotalA", "HLA-DR_TotalA", "TCRg/d_TotalA",  "TIGIT_TotalA", "XCR1_TotalA"), min.cutoff = "q05", max.cutoff = "q95", ncol = 4)
 
-RidgePlot(cbmc, features = c("adt_CD3", "adt_CD11c", "adt_CD8", "adt_CD16"), ncol = 2)
+RidgePlot(cbmc, features = c("CD1c_TotalA", "CD3_TotalA", "CD4_TotalA", "CD8_TotalA", "CD11c_TotalA", "CD11b_TotalA", "CD14_TotalA", "CD15_TotalA", 
+                             "CD16_TotalA", "CD19_TotalA", "CD25_TotalA", "CD45RA_TotalA", "CD45RO_TotalA", "CD56_TotalA", "CD69_TotalA",
+                             "CD117_TotalA", "CD123_TotalA", "CD127_TotalA", "CD141_TotalA", "CD183_TotalA", "CD194_TotalA", "CD196_TotalA", "CD197_TotalA",
+                             "CD207_TotalA", "CD279_TotalA", "HLA-DR_TotalA", "TCRg/d_TotalA",  "TIGIT_TotalA", "XCR1_TotalA"), ncol = 4)
