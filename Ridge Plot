@@ -1,35 +1,36 @@
+devtools::install_github('satijalab/seurat-data')
+install.packages()
+install.packages("devtools")
+library(Seurat)
 library(SeuratData)
 library(ggplot2)
-install.packages("Seurat")
-library(Seurat)
-install.packages(c('dplyr','patchwork'))
-library(dplyr)
 library(patchwork)
 
-setwd("C:/Users/")
+setwd("C:/Users/gabri/Desktop")
 
-cbmc.rna <- as.sparse(read.csv(file = "C:/Users/gabri/Desktop/CITE-seq data/**.gz file**", sep = ",", 
-                               header = TRUE, row.names = 1))
+cbmc.rna <- as.sparse(read.csv(file = "C:/Users/gabri/Desktop/CITE-seq data/skin 239/matrix239.mtx.gz", sep = ",", 
+                               header = TRUE, row.names = 1, as.is = T))
 
 
 cbmc.rna <- CollapseSpeciesExpressionMatrix(cbmc.rna)
 
 
-cbmc.adt <- as.sparse(read.csv(file = "C:/Users/gabri/Desktop/CITE-seq data/**.ggz file**z", sep = ",", 
+cbmc.adt <- as.sparse(read.csv(file = "C:/Users/gabri/Desktop/CITE-seq data/231_236_ADT/231and236ADT.csv.gz", sep = ",", 
                                header = TRUE, row.names = 1))
-cbmc.adt <- cbmc.adt[setdiff(rownames(x = cbmc.adt), c("CD11c", "TIGIT",  "CD141",  "CD14",  "CD4",  "CD183",  "CD8",    "CD197",  "CD207",  "CD117",  "CD1c",   "CD194",  "CD56",   "CD19",   "CD45RA", "CD69",  
-                                  "HLA-DR",  "CD123",  "CD25",   "CD45RO",  "CD15",   "CD279",  "TCRgd",  "CD3",    "CD16",   "CD196",  "CD11b",  "CD127",  "XCR1" )), ]
 
 
-cbmc <- CreateSeuratObject(counts = cbmc.rna)
-
-cbmc <- NormalizeData(cbmc)
+cbmc.adt <- cbmc.adt[setdiff(rownames(x = cbmc.adt), c("CCR5", "CCR7", "CD10")), ]
 
 
-cbmc <- FindVariableFeatures(cbmc)
+cbmc <- CreateSeuratObject(counts = cbmc.rna, project = "skin239", min.cells = 1, min.features = 1)
 
+
+cbmc <- NormalizeData(cbmc.rna, New, verbose = T, normalization.method = "LogNormalize")
+
+cbmc <- FindVariableFeatures(cbmc, selection.method = "vst", loess.span = 0.3)
 
 cbmc <- ScaleData(cbmc)
+
 
 cbmc <- RunPCA(cbmc, verbose = FALSE)
 ElbowPlot(cbmc, ndims = 50)
@@ -38,7 +39,10 @@ cbmc <- FindNeighbors(cbmc, dims = 1:25)
 cbmc <- FindClusters(cbmc, resolution = 0.8)
 cbmc <- RunTSNE(cbmc, dims = 1:25, method = "FIt-SNE")
 
+
 cbmc.rna.markers <- FindAllMarkers(cbmc, max.cells.per.ident = 100, min.diff.pct = 0.3, only.pos = TRUE)
+
+#LOOK AT MARKERS BEFORE RENAMING CLUSTER IDS
 
 new.cluster.ids <- c("Memory CD4 T", "CD14+ Mono", "Naive CD4 T", "NK", "CD14+ Mono", "Mouse", "B", 
                      "CD8 T", "CD16+ Mono", "T/Mono doublets", "NK", "CD34+", "Multiplets", "Mouse", "Eryth", "Mk", 
@@ -51,14 +55,19 @@ DimPlot(cbmc, label = TRUE) + NoLegend()
 
 cbmc[["ADT"]] <- CreateAssayObject(counts = cbmc.adt)
 
+
 cbmc <- NormalizeData(cbmc, assay = "ADT", normalization.method = "CLR")
 cbmc <- ScaleData(cbmc, assay = "ADT")
+
+
 FeaturePlot(cbmc, features = c("CD1c_TotalA", "CD3_TotalA", "CD4_TotalA", "CD8_TotalA", "CD11c_TotalA", "CD11b_TotalA", "CD14_TotalA", "CD15_TotalA", 
                                "CD16_TotalA", "CD19_TotalA", "CD25_TotalA", "CD45RA_TotalA", "CD45RO_TotalA", "CD56_TotalA", "CD69_TotalA",
                                "CD117_TotalA", "CD123_TotalA", "CD127_TotalA", "CD141_TotalA", "CD183_TotalA", "CD194_TotalA", "CD196_TotalA", "CD197_TotalA",
                                "CD207_TotalA", "CD279_TotalA", "HLA-DR_TotalA", "TCRg/d_TotalA",  "TIGIT_TotalA", "XCR1_TotalA"), min.cutoff = "q05", max.cutoff = "q95", ncol = 4)
 
+
 RidgePlot(cbmc, features = c("CD1c_TotalA", "CD3_TotalA", "CD4_TotalA", "CD8_TotalA", "CD11c_TotalA", "CD11b_TotalA", "CD14_TotalA", "CD15_TotalA", 
                              "CD16_TotalA", "CD19_TotalA", "CD25_TotalA", "CD45RA_TotalA", "CD45RO_TotalA", "CD56_TotalA", "CD69_TotalA",
                              "CD117_TotalA", "CD123_TotalA", "CD127_TotalA", "CD141_TotalA", "CD183_TotalA", "CD194_TotalA", "CD196_TotalA", "CD197_TotalA",
                              "CD207_TotalA", "CD279_TotalA", "HLA-DR_TotalA", "TCRg/d_TotalA",  "TIGIT_TotalA", "XCR1_TotalA"), ncol = 4)
+
