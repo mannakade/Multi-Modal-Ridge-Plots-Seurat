@@ -1,6 +1,5 @@
-devtools::install_github('satijalab/seurat-data')
-install.packages()
 install.packages("devtools")
+devtools::install_github('satijalab/seurat-data')
 library(Seurat)
 library(SeuratData)
 library(ggplot2)
@@ -8,11 +7,12 @@ library(patchwork)
 
 setwd("C:/Users/gabri/Desktop")
 
-cbmc.rna <- as.sparse(read.csv(file = "C:/Users/gabri/Desktop/CITE-seq data/skin 239/matrix239.mtx.gz", sep = ",", 
-                               header = TRUE, row.names = 1, as.is = T))
+cbmc.rna <- Read10X("C:/Users/gabri/Desktop/CITE-seq data/skin 239") 
+
+# cbmc.rna <- as.sparse(read.csv(cbmc.rna$'Antibody Capture', sep = ",", header = TRUE, row.names = 1, as.is = T))
 
 
-cbmc.rna <- CollapseSpeciesExpressionMatrix(cbmc.rna)
+# cbmc.rna <- CollapseSpeciesExpressionMatrix(cbmc.rna)
 
 
 cbmc.adt <- as.sparse(read.csv(file = "C:/Users/gabri/Desktop/CITE-seq data/231_236_ADT/231and236ADT.csv.gz", sep = ",", 
@@ -25,7 +25,7 @@ cbmc.adt <- cbmc.adt[setdiff(rownames(x = cbmc.adt), c("CCR5", "CCR7", "CD10")),
 cbmc <- CreateSeuratObject(counts = cbmc.rna, project = "skin239", min.cells = 1, min.features = 1)
 
 
-cbmc <- NormalizeData(cbmc.rna, New, verbose = T, normalization.method = "LogNormalize")
+cbmc <- NormalizeData(cbmc.rna, verbose = T, normalization.method = "LogNormalize")
 
 cbmc <- FindVariableFeatures(cbmc, selection.method = "vst", loess.span = 0.3)
 
