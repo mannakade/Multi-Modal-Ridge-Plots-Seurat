@@ -4,26 +4,23 @@ library(Seurat)
 library(SeuratData)
 library(ggplot2)
 library(patchwork)
+library(dplyr)
+library(Matrix)
 
 setwd("C:/Users/gabri/Desktop")
 
 cbmc.rna <- Read10X("C:/Users/gabri/Desktop/CITE-seq data/skin 239") 
 
-# cbmc.rna <- as.sparse(read.csv(cbmc.rna$'Antibody Capture', sep = ",", header = TRUE, row.names = 1, as.is = T))
+cbmc.rna <- as.sparse(read.csv("C:/Users/gabri/Desktop/CITE-seq data/skin 239/matrix.mtx.gz", sep = ",", header = TRUE, row.names = 1, as.is = T))
 
-
-# cbmc.rna <- CollapseSpeciesExpressionMatrix(cbmc.rna)
-
+cbmc.rna <- CollapseSpeciesExpressionMatrix(cbmc.rna$`Antibody Capture`)
 
 cbmc.adt <- as.sparse(read.csv(file = "C:/Users/gabri/Desktop/CITE-seq data/231_236_ADT/231and236ADT.csv.gz", sep = ",", 
                                header = TRUE, row.names = 1))
 
-
 cbmc.adt <- cbmc.adt[setdiff(rownames(x = cbmc.adt), c("CCR5", "CCR7", "CD10")), ]
 
-
-cbmc <- CreateSeuratObject(counts = cbmc.rna, project = "skin239", min.cells = 1, min.features = 1)
-
+cbmc <- CreateSeuratObject(counts = cbmc.rna$`Antibody Capture`, project = "skin239", min.cells = 1, min.features = 200)
 
 cbmc <- NormalizeData(cbmc.rna, verbose = T, normalization.method = "LogNormalize")
 
@@ -32,8 +29,8 @@ cbmc <- FindVariableFeatures(cbmc, selection.method = "vst", loess.span = 0.3)
 cbmc <- ScaleData(cbmc)
 
 
-cbmc <- RunPCA(cbmc, verbose = FALSE)
-ElbowPlot(cbmc, ndims = 50)
+cbmc <- RunPCA(cbmc, verbose = FALSE, npcs = 3)
+ElbowPlot(cbmc, ndims = 3)
 
 cbmc <- FindNeighbors(cbmc, dims = 1:25)
 cbmc <- FindClusters(cbmc, resolution = 0.8)
