@@ -22,10 +22,12 @@ Assays(cbmc)
 rownames(cbmc[["ADT"]])
 
 ##Listing ADT & RNA markers
-adt-markers <- FindMarkers(cbmc, ident.1 = 6, assay = "ADT")
-rna-markers <- FindMarkers(cbmc, ident.1 = 6, assay = "RNA")
-head(adt-markers)
-head(rna-markers)
+adt_markers <- FindMarkers(cbmc, ident.1 = 6, assay = "ADT")
+rna_markers <- FindMarkers(cbmc, ident.1 = 6, assay = "RNA")
+head(adt_markers)
+head(rna_markers)
+
+adt_markers
 
 ##Pre-Processing
 
